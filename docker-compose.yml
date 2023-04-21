@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15.2
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=marcusoft
+      - POSTGRES_USER=marcusoft_admin
+      - POSTGRES_PASSWORD=123456
+
+volumes:
+  db_data:
