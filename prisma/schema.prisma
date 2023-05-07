@@ -11,13 +11,18 @@ model Product {
   id            Int       @id @default(autoincrement())
   description   String
   price         Decimal
+  width         Int       
+  height        Int
+  length        Int
+  weight        Decimal
 
   @@map("product")
 }
 
 model Coupon {
-  code          String    @id
-  percentage    Decimal
+  code            String    @id
+  percentage      Decimal
+  expire_date     DateTime
 
   @@map("coupon")
 }
