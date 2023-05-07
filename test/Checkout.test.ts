@@ -1,7 +1,10 @@
 import axios from 'axios';
+import sinon from 'sinon';
 import Checkout from '../src/Checkout';
 import ProductRepository from '../src/ProductRepository';
 import CouponRepository from '../src/CouponRepository';
+import ProductRepositoryDatabase from '../src/ProductRepositoryDatabase';
+import EmailGatewayConsole from '../src/EmailGatewayConsole';
 
 axios.defaults.validateStatus = function () {
   return true;
@@ -152,6 +155,63 @@ test('Deve criar um pedido com 3 produtos e calcular o valor total', async funct
   const output = await checkout.execute(input);
 
   expect(output.total).toBe(11030);
+});
+
+test('Deve criar um pedido com 1 item com stub', async function () {
+  const productRepositoryStub = sinon.stub(ProductRepositoryDatabase.prototype, 'get').resolves({
+    id: 1, description: 'A', price: 1000, 
+  });
+  checkout = new Checkout();
+  const input = {
+    cpf: '685.830.780-09',
+    items: [
+      { id: 1, quantity: 1 },
+    ]
+  };
+
+  const output = await checkout.execute(input);
+  expect(output.total).toBe(1000);
+  productRepositoryStub.restore();
+});
+
+test('Deve verificar se o email foi enviado usando um spy', async function () {
+  const emailGatewaySpy = sinon.spy(EmailGatewayConsole.prototype, "send");
+  const productRepositoryStub = sinon.stub(ProductRepositoryDatabase.prototype, 'get').resolves({
+    id: 1, description: 'A', price: 1000, 
+  });
+  checkout = new Checkout();
+  const input = {
+    cpf: '685.830.780-09',
+    items: [
+      { id: 1, quantity: 1 },
+    ],
+    email: 'john.doe@gmail.com'
+  };
+
+  const output = await checkout.execute(input);
+  expect(output.total).toBe(1000);
+  expect(emailGatewaySpy.calledOnce).toBeTruthy();
+  productRepositoryStub.restore();
+  emailGatewaySpy.restore();
+});
+
+test('Deve verificar se o email foi enviado usando um mock', async function () {
+  const productRepositoryMock = sinon.mock(ProductRepositoryDatabase.prototype);
+  productRepositoryMock.expects("get").once().resolves({
+    id: 1, description: 'A', price: 1000, 
+  });
+
+  checkout = new Checkout();
+  const input = {
+    cpf: '685.830.780-09',
+    items: [
+      { id: 1, quantity: 1 },
+    ],
+    email: 'john.doe@gmail.com'
+  };
+
+  const output = await checkout.execute(input);
+  productRepositoryMock.verify();
 });
 
 test('Deve criar um pedido com 3 produtos, associar um cupom válido e calcular o total (percentual sobre o total do pedido)', async function () {
