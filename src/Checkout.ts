@@ -1,8 +1,10 @@
 import { isBefore } from 'date-fns';
 
+import EmailGateway from './EmailGateway';
+import EmailGatewayConsole from './EmailGatewayConsole';
 import ProductRepository from './ProductRepository';
-import CouponRepository from './CouponRepository';
 import ProductRepositoryDatabase from './ProductRepositoryDatabase';
+import CouponRepository from './CouponRepository';
 import CouponRepositoryDatabase from './CouponRepositoryDatabase';
 import { validate } from './validateCpf';
 
@@ -11,6 +13,7 @@ export default class Checkout {
   constructor(
     readonly productRepository: ProductRepository = new ProductRepositoryDatabase(),
     readonly couponRepository: CouponRepository = new CouponRepositoryDatabase(),
+    readonly emailGateway: EmailGateway = new EmailGatewayConsole(),
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -73,6 +76,15 @@ export default class Checkout {
     }
 
     output.total += output.freight;
+
+    if (input.email) {
+      await this.emailGateway.send(
+        'Compra confirmada',
+        '...',
+        input.email,
+        'no-reply@marcusoft.com'
+      );
+    }
   
     return output;
   }
@@ -87,6 +99,7 @@ type Input = {
   coupon?: string,
   from?: string,
   to?: string,
+  email?: string,
 }
 
 type Output = {
