@@ -1,17 +1,82 @@
 import axios from 'axios';
 import Checkout from '../src/Checkout';
+import ProductRepository from '../src/ProductRepository';
+import CouponRepository from '../src/CouponRepository';
 
 axios.defaults.validateStatus = function () {
   return true;
 }
+
+let checkout: Checkout;
+
+beforeEach(() => {
+
+  const products: any = {
+    1: { 
+      id: 1, 
+      description: 'A', 
+      price: 1000,
+      width: 100,
+      height: 30,
+      length: 10,
+      weight: 3
+    },
+    2: { 
+      id: 2, 
+      description: 'B', 
+      price: 5000,
+      width: 50,
+      height: 50,
+      length: 50,
+      weight: 22
+    },
+    3: { 
+      id: 3, 
+      description: 'C', 
+      price: 30,
+      width: 10,
+      height: 10,
+      length: 10,
+      weight: 0.9
+    },
+  };
+
+  const productRepository: ProductRepository = {
+    async get(idProduct: number): Promise<any> {
+      const product = products[idProduct];
+      //console.log({ product })
+      return product;
+    }
+  };
+
+  const coupons: any = {
+    "VALE20": {
+      code: 'VALE20', 
+      percentage: 20,
+      expire_date: new Date('2023-10-01T10:00:00')
+    },
+    "VALE10": {
+      code: 'VALE10', 
+      percentage: 10,
+      expire_date: new Date('2022-10-01T10:00:00')
+    }
+  }
+
+  const couponRepository: CouponRepository = {
+    async get(code: string): Promise<any> {
+      const coupon = coupons[code];
+      return coupon;
+    }
+  };
+
+  checkout = new Checkout(productRepository, couponRepository);
+});
 
 test('Não deve criar um pedido com CPF inválido', async function() {
   const input = {
     cpf: '378.299.138-88',
     items: []
   };
-
-  const checkout = new Checkout();
 
   expect(() => checkout.execute(input)).rejects.toThrow(new Error('CPF inválido'));
 });
@@ -23,8 +88,6 @@ test('Não deve fazer um pedido com quantidade negativa de item', async function
       { id: 1, quantity: -1 },
     ]
   };
-
-  const checkout = new Checkout();
 
   expect(() => checkout.execute(input)).rejects.toThrow(new Error('Quantidade inválida'));
 });
@@ -38,7 +101,6 @@ test('Não deve ser possível fazer pedido com itens duplicados', async function
     ]
   };
 
-  const checkout = new Checkout();
   expect(() => checkout.execute(input)).rejects.toThrow(new Error('Produto duplicado'));
 });
 
@@ -50,7 +112,6 @@ test('Não deve criar um pedido se algum produto não existir', async function()
     ],
   };
 
-  const checkout = new Checkout();
   expect(() => checkout.execute(input)).rejects.toThrow(new Error('Produto não existente'));
 });
 
@@ -63,7 +124,6 @@ test('Não deve aplicar cupom de desconto se o mesmo não existir', async functi
     ]
   };
 
-  const checkout = new Checkout();
   expect(() => checkout.execute(input)).rejects.toThrow(new Error('Cupom de desconto inexistente'));
 });
 
@@ -76,7 +136,6 @@ test('Não deve aplicar cupom de desconto expirado', async function() {
     ]
   };
 
-  const checkout = new Checkout();
   expect(() => checkout.execute(input)).rejects.toThrow(new Error('Cupom de desconto expirado'));
 });
 
@@ -90,7 +149,6 @@ test('Deve criar um pedido com 3 produtos e calcular o valor total', async funct
     ]
   };
 
-  const checkout = new Checkout();
   const output = await checkout.execute(input);
 
   expect(output.total).toBe(11030);
@@ -107,7 +165,6 @@ test('Deve criar um pedido com 3 produtos, associar um cupom válido e calcular 
     ]
   };
 
-  const checkout = new Checkout();
   const output = await checkout.execute(input);
 
   expect(output.total).toBe(8824);
@@ -124,7 +181,6 @@ test('Deve fazer um pedido com 3 itens calculando o frete', async function() {
     to: '22030060'
   };
 
-  const checkout = new Checkout();
   const output = await checkout.execute(input);
 
   expect(output.subtotal).toBe(6000);
@@ -144,7 +200,6 @@ test('Deve fazer um pedido com 3 itens calculando o frete com preço mínimo', a
     to: '22030060'
   };
 
-  const checkout = new Checkout();
   const output = await checkout.execute(input);
 
   expect(output.subtotal).toBe(6090);
