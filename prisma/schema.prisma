@@ -15,6 +15,7 @@ model Product {
   height        Int
   length        Int
   weight        Decimal
+  orders        Item[]
 
   @@map("product")
 }
@@ -25,4 +26,28 @@ model Coupon {
   expire_date     DateTime
 
   @@map("coupon")
+}
+
+model Order {
+  id        String  @id @db.Uuid
+  code      String
+  cpf       String
+  total     Decimal
+  freight   Decimal
+  products  Item[]
+
+  @@map("order")
+}
+
+model Item {
+  order       Order     @relation(fields: [id_order], references: [id])
+  id_order    String    @db.Uuid
+  product     Product   @relation(fields: [id_product], references: [id])
+  id_product  Int
+  price       Decimal
+  quantity    Int
+
+  @@id([id_order, id_product])
+
+  @@map("item")
 }
