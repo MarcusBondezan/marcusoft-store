@@ -1,8 +1,12 @@
-import { isAfter } from "date-fns";
 import CouponRepository from "./CouponRepository";
+import RepositoryFactory from "./RepositoryFactory";
 
 export default class ValidateCoupon {
-  constructor(readonly couponRepository: CouponRepository) {}
+  couponRepository: CouponRepository;
+
+  constructor(repositoryFactory: RepositoryFactory) {
+    this.couponRepository = repositoryFactory.createCouponRepository();
+  }
 
   async execute(code: string): Promise<Output> {
     const output = {

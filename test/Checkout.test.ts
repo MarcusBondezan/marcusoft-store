@@ -9,6 +9,8 @@ import GetOrder from '../src/GetOrder';
 import OrderRepositoryDatabase from '../src/OrderRepositoryDatabase';
 import Product from '../src/Product';
 import Coupon from '../src/Coupon';
+import DatabaseRepositoryFactory from '../src/DatabaseRepositoryFactory';
+import RepositoryFactory from '../src/RepositoryFactory';
 
 axios.defaults.validateStatus = function () {
   return true;
@@ -16,37 +18,12 @@ axios.defaults.validateStatus = function () {
 
 let checkout: Checkout;
 let getOrder: GetOrder;
-const orderRepository = new OrderRepositoryDatabase();
+let repositoryFactory: RepositoryFactory;
 
 beforeEach(() => {
-
-  const products: any = {
-    1: new Product(1,'A',1000,100,30,10,3),
-    2: new Product(2,'B',5000,50,50,50,22), 
-    3: new Product(3,'C',30,10,10,10,0.9),
-  };
-
-  const productRepository: ProductRepository = {
-    async get(idProduct: number): Promise<any> {
-      const product = products[idProduct];
-      return product;
-    }
-  };
-
-  const coupons: any = {
-    "VALE20": new Coupon('VALE20', 20, new Date('2023-10-01T10:00:00')),
-    "VALE10": new Coupon('VALE10', 10, new Date('2022-10-01T10:00:00')),
-  }
-
-  const couponRepository: CouponRepository = {
-    async get(code: string): Promise<any> {
-      const coupon = coupons[code];
-      return coupon;
-    }
-  };
-
-  checkout = new Checkout(productRepository, couponRepository, orderRepository);
-  getOrder = new GetOrder(orderRepository);
+  repositoryFactory = new DatabaseRepositoryFactory();
+  checkout = new Checkout(repositoryFactory);
+  getOrder = new GetOrder(repositoryFactory);
 });
 
 test('Não deve criar um pedido com CPF inválido', async function() {
@@ -103,7 +80,6 @@ test('Deve criar um pedido com 3 produtos e calcular o valor total', async funct
 test('Deve criar um pedido com 1 item com stub', async function () {
   const productRepositoryStub = sinon.stub(ProductRepositoryDatabase.prototype, 'get')
   .resolves(new Product(1, 'A', 1000, 1, 1, 1, 1));
-  checkout = new Checkout();
   const input = {
     idOrder: crypto.randomUUID(),
     cpf: '685.830.780-09',
@@ -189,9 +165,10 @@ test('Deve fazer um pedido com 3 itens e obter o pedido salvo', async function()
 });
 
 test('Deve fazer um pedido com 3 e gerar o código do pedido ', async function() {
+  const orderRepository = repositoryFactory.createOrderRepository();
+  await orderRepository.clear();
   const now = new Date('2023-01-01T10:00:00');
   const dateStub = sinon.useFakeTimers(now.getTime());
-  await orderRepository.clear();
   await checkout.execute({
     idOrder: crypto.randomUUID(),
     cpf: '685.830.780-09',
