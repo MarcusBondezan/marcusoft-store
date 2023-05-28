@@ -58,7 +58,6 @@ type Input = {
   coupon?: string,
   from?: string,
   to?: string,
-  email?: string,
 }
 
 type Output = {
