@@ -1,12 +1,13 @@
-import { prisma } from './prisma-client';
-import { Decimal } from '@prisma/client/runtime';
+import DatabaseConnection from './DabaseConnection';
 import OrderRepository from "./OrderRepository";
 import Order from './Order';
 
 export default class OrderRepositoryDatabase implements OrderRepository {
 
+  constructor(readonly connection: DatabaseConnection) {}
+
   async get(uuid: string): Promise<any> {
-    const orderData = await prisma.order.findUnique({ where: { id: uuid }});
+    const [orderData] = await this.connection.query('select * from "order" where id = $1', [uuid]);
     
     if (orderData) {
       return {
@@ -19,23 +20,22 @@ export default class OrderRepositoryDatabase implements OrderRepository {
   }
   
   async save(order: Order): Promise<void> {
-    await prisma.order.create({
-      data: {
-        id: order.idOrder,
-        code: order.code,
-        cpf: order.cpf.value,
-        total: order.getTotal(),
-        freight: order.freight,
-      }
-    });
+    await this.connection.query('insert into "order" (id, code, cpf, total, freight) values ($1, $2, $3, $4, $5)', [
+      order.idOrder, 
+      order.code, 
+      order.cpf.value,
+      order.getTotal(),
+      order.freight
+    ]);
   }
 
   async clear(): Promise<void> {
-    await prisma.order.deleteMany();
+    await this.connection.query('delete from "order"', []);
   }
 
   async count(): Promise<number> {
-    return await prisma.order.count();
+    const [result] = await this.connection.query('select count(*)::integer from "order"', []);
+    return result.count;
   }
 
 }

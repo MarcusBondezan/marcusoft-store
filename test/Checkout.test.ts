@@ -2,15 +2,13 @@ import axios from 'axios';
 import sinon from 'sinon';
 import crypto from 'crypto';
 import Checkout from '../src/Checkout';
-import ProductRepository from '../src/ProductRepository';
-import CouponRepository from '../src/CouponRepository';
 import ProductRepositoryDatabase from '../src/ProductRepositoryDatabase';
 import GetOrder from '../src/GetOrder';
-import OrderRepositoryDatabase from '../src/OrderRepositoryDatabase';
 import Product from '../src/Product';
-import Coupon from '../src/Coupon';
 import DatabaseRepositoryFactory from '../src/DatabaseRepositoryFactory';
 import RepositoryFactory from '../src/RepositoryFactory';
+import PgPromiseAdapter from '../src/PgPromiseAdapter';
+import DatabaseConnection from '../src/DabaseConnection';
 
 axios.defaults.validateStatus = function () {
   return true;
@@ -19,11 +17,18 @@ axios.defaults.validateStatus = function () {
 let checkout: Checkout;
 let getOrder: GetOrder;
 let repositoryFactory: RepositoryFactory;
+let connection: DatabaseConnection;
 
-beforeEach(() => {
-  repositoryFactory = new DatabaseRepositoryFactory();
+beforeEach(async () => {
+  connection = new PgPromiseAdapter();
+  await connection.connect();
+  repositoryFactory = new DatabaseRepositoryFactory(connection);
   checkout = new Checkout(repositoryFactory);
   getOrder = new GetOrder(repositoryFactory);
+});
+
+afterEach(async () => {
+  await connection.close();
 });
 
 test('Não deve criar um pedido com CPF inválido', async function() {
@@ -33,7 +38,7 @@ test('Não deve criar um pedido com CPF inválido', async function() {
     items: []
   };
 
-  expect(() => checkout.execute(input)).rejects.toThrow(new Error('CPF Inválido'));
+  await expect(() => checkout.execute(input)).rejects.toThrow(new Error('CPF Inválido'));
 });
 
 test('Não deve fazer um pedido com quantidade negativa de item', async function() {
@@ -45,7 +50,7 @@ test('Não deve fazer um pedido com quantidade negativa de item', async function
     ]
   };
 
-  expect(() => checkout.execute(input)).rejects.toThrow(new Error('Quantidade inválida'));
+  await expect(() => checkout.execute(input)).rejects.toThrow(new Error('Quantidade inválida'));
 });
 
 test('Não deve ser possível fazer pedido com itens duplicados', async function() {
@@ -58,7 +63,7 @@ test('Não deve ser possível fazer pedido com itens duplicados', async function
     ]
   };
 
-  expect(() => checkout.execute(input)).rejects.toThrow(new Error('Item duplicado'));
+  await expect(() => checkout.execute(input)).rejects.toThrow(new Error('Item duplicado'));
 });
 
 test('Deve criar um pedido com 3 produtos e calcular o valor total', async function () {
@@ -168,7 +173,7 @@ test('Deve fazer um pedido com 3 e gerar o código do pedido ', async function()
   const orderRepository = repositoryFactory.createOrderRepository();
   await orderRepository.clear();
   const now = new Date('2023-01-01T10:00:00');
-  const dateStub = sinon.useFakeTimers(now.getTime());
+  //const dateStub = sinon.useFakeTimers(now.getTime());
   await checkout.execute({
     idOrder: crypto.randomUUID(),
     cpf: '685.830.780-09',
@@ -192,5 +197,5 @@ test('Deve fazer um pedido com 3 e gerar o código do pedido ', async function()
 
   const output = await getOrder.execute(idOrder2);
   expect(output.code).toBe('202300000002');
-  dateStub.restore();
+  //dateStub.restore();
 });

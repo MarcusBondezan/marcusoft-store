@@ -1,21 +1,24 @@
-import { prisma } from './prisma-client';
 import ProductRepository from './ProductRepository';
 import Product from './Product';
+import DatabaseConnection from './DabaseConnection';
 
 export default class ProductRepositoryDatabase implements ProductRepository {
-  async get (idProduct: number): Promise<Product | null> {
-    const prismaProduct = await prisma.product.findUnique({ where: { id: idProduct}});
 
-    if (!prismaProduct) return null;
+  constructor(readonly connection: DatabaseConnection) {}
+
+  async get (idProduct: number): Promise<Product | null> {
+    const [productData] = await this.connection.query('select * from product where id = $1', [idProduct]);
+
+    if (!productData) return null;
 
     return new Product(
-      prismaProduct.id,
-      prismaProduct.description,
-      Number(prismaProduct.price),
-      Number(prismaProduct.width),
-      Number(prismaProduct.height),
-      Number(prismaProduct.length),
-      Number(prismaProduct.weight)
+      productData.id,
+      productData.description,
+      Number(productData.price),
+      Number(productData.width),
+      Number(productData.height),
+      Number(productData.length),
+      Number(productData.weight)
     );
   }
 }

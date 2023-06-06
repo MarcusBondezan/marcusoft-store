@@ -1,17 +1,20 @@
-import { prisma } from './prisma-client';
 import CouponRepository from './CouponRepository';
 import Coupon from './Coupon';
+import DatabaseConnection from './DabaseConnection';
 
 export default class CouponRepositoryDatabase implements CouponRepository {
+
+  constructor(readonly connection: DatabaseConnection) {}
+
   async get (code: string): Promise<Coupon | null> {
-    const prismaCoupon = await prisma.coupon.findUnique({ where: { code }});
+    const [couponData] = await this.connection.query('select * from coupon where code = $1', [code]);
 
-    if (!prismaCoupon) return null;
-
+    if (!couponData) return null;
+    
     return new Coupon(
-      prismaCoupon.code,
-      Number(prismaCoupon.percentage),
-      prismaCoupon.expire_date,
+      couponData.code,
+      Number(couponData.percentage),
+      couponData.expire_date,
     );
   }
 }

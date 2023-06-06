@@ -1,5 +1,5 @@
 import DatabaseRepositoryFactory from "../src/DatabaseRepositoryFactory";
-import ProductRepositoryDatabase from "../src/ProductRepositoryDatabase";
+import PgPromiseAdapter from "../src/PgPromiseAdapter";
 import SimulateFreight from "../src/SimulateFreight";
 
 test('Deve simular o frete', async function() {
@@ -13,8 +13,11 @@ test('Deve simular o frete', async function() {
     to: '22030060'
   };
 
-  const repositoryFactory = new DatabaseRepositoryFactory();
+  const connection = new PgPromiseAdapter();
+  await connection.connect();
+  const repositoryFactory = new DatabaseRepositoryFactory(connection);
   const simulateFreight = new SimulateFreight(repositoryFactory);
   const output = await simulateFreight.execute(input);
   expect(output.freight).toBe(280);
+  await connection.close();
 });
