@@ -1,5 +1,9 @@
 import { mount } from '@vue/test-utils';
 import AppVue from '../src/App.vue';
+import HttpCheckoutGateway from '../src/gateway/HttpCheckoutGateway';
+import CheckoutGateway from '../src/gateway/CheckoutGateway';
+import HttpClient from '../src/http/HttpClient';
+import AxiosAdapter from '../src/http/AxiosAdapter';
 
 async function sleep (time: number) {
   return new Promise((resolve) => {
@@ -10,7 +14,29 @@ async function sleep (time: number) {
 }
 
 test('Deve testar tudo', async function () {
-  const wrapper = mount(AppVue, {});
+  const checkoutGateway: CheckoutGateway = {
+    async getProducts(): Promise<any> {
+      return [
+        { id: 1, description: 'A', price: 1000 },
+        { id: 2, description: 'B', price: 5000 },
+        { id: 3, description: 'C', price: 30 },
+      ]
+    },
+    async checkout(order: any): Promise<any> {
+      return { freight: 0, total: 6090 }
+    }
+  };
+
+  const httpClient: HttpClient = new AxiosAdapter();
+  const httpCheckoutGateway: CheckoutGateway = new HttpCheckoutGateway(httpClient);
+  
+  const wrapper = mount(AppVue, {
+    global: {
+      provide: {
+        "checkoutGateway": httpCheckoutGateway
+      }
+    }
+  });
   await sleep(100);
   expect(wrapper.get(".module-name").text()).toBe('Checkout');
   expect(wrapper.findAll(".product-description").at(0)?.text()).toBe('A');

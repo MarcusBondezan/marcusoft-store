@@ -10,9 +10,11 @@
     "test": "vitest --dom"
   },
   "dependencies": {
+    "@types/uuid": "^9.0.2",
     "@vue/test-utils": "^2.4.0",
     "axios": "^1.4.0",
     "happy-dom": "^9.20.3",
+    "uuid": "^9.0.0",
     "vitest": "^0.32.2",
     "vue": "^3.2.47"
   },
