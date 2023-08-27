@@ -1,5 +1,6 @@
 import { isAfter } from "date-fns";
 
+// DDD - Entity
 export default class Coupon {
   constructor(
     readonly code: string,

@@ -1,3 +1,4 @@
+// DDD - Entity - Aggregate Root
 export default class Product {
   constructor(
     readonly id: number,

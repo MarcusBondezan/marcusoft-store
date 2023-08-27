@@ -3,6 +3,7 @@ import Cpf from "./Cpf";
 import Item from "./Item";
 import Product from "./Product";
 
+// DDD - Entity - Aggregate Root
 export default class Order {
   cpf: Cpf;
   items: Item[];

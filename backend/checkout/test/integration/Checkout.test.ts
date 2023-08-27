@@ -9,6 +9,10 @@ import DatabaseRepositoryFactory from '../../src/infra/factory/DatabaseRepositor
 import RepositoryFactory from '../../src/application/factory/RepositoryFactory';
 import PgPromiseAdapter from '../../src/infra/database/PgPromiseAdapter';
 import DatabaseConnection from '../../src/infra/database/DabaseConnection';
+import AxiosAdapter from '../../src/infra/http/AxiosAdapter';
+import GatewayHttpFactory from '../../src/infra/factory/GatewayHttpFactory';
+import UseCaseFactory from '../../src/infra/factory/UseCaseFactory';
+import CatalogHttpGateway from '../../src/infra/gateway/CatalogHttpGateway';
 
 axios.defaults.validateStatus = function () {
   return true;
@@ -23,7 +27,9 @@ beforeEach(async () => {
   connection = new PgPromiseAdapter();
   await connection.connect();
   repositoryFactory = new DatabaseRepositoryFactory(connection);
-  checkout = new Checkout(repositoryFactory);
+  const httpClient = new AxiosAdapter();
+  const gatewayFactory = new GatewayHttpFactory(httpClient);
+  checkout = new Checkout(repositoryFactory, gatewayFactory);
   getOrder = new GetOrder(repositoryFactory);
 });
 
@@ -83,8 +89,7 @@ test('Deve criar um pedido com 3 produtos e calcular o valor total', async funct
 });
 
 test('Deve criar um pedido com 1 item com stub', async function () {
-  const productRepositoryStub = sinon.stub(ProductRepositoryDatabase.prototype, 'get')
-  .resolves(new Product(1, 'A', 1000, 1, 1, 1, 1));
+  const catalogGatewayStub = sinon.stub(CatalogHttpGateway.prototype, 'getProduct').resolves(new Product(1, 'A', 100, 1, 1, 1, 1, 0.03, 100));
   const input = {
     idOrder: crypto.randomUUID(),
     cpf: '685.830.780-09',
@@ -94,8 +99,8 @@ test('Deve criar um pedido com 1 item com stub', async function () {
   };
 
   const output = await checkout.execute(input);
-  expect(output.total).toBe(1000);
-  productRepositoryStub.restore();
+  expect(output.total).toBe(100);
+  catalogGatewayStub.restore();
 });
 
 test('Deve criar um pedido com 3 produtos, associar um cupom válido e calcular o total (percentual sobre o total do pedido)', async function () {

@@ -1,3 +1,4 @@
+// DDD - Domain Service
 export default class FreightCalculator {
   static calculate(distance: number, volume: number, density: number): number {
     let freight = volume * distance * (density/100);

@@ -1,22 +1,24 @@
 import DatabaseConnection from '../database/DabaseConnection';
 import OrderRepository from "../../application/repository/OrderRepository";
 import Order from '../../domain/entity/Order';
+import Item from '../../domain/entity/Item';
 
 export default class OrderRepositoryDatabase implements OrderRepository {
 
   constructor(readonly connection: DatabaseConnection) {}
 
-  async get(uuid: string): Promise<any> {
+  async get(uuid: string): Promise<Order> {
     const [orderData] = await this.connection.query('select * from "order" where id = $1', [uuid]);
-    
-    if (orderData) {
-      return {
-        ...orderData,
-        total: Number(orderData.total)
-      }
+    const order = new Order(orderData.id, orderData.cpf, orderData.date, orderData.sequence);
+
+    const itemsData = await this.connection.query('select * from "item" where id_order = $1', [uuid]);
+
+    for (const itemData of itemsData) {
+      const item = new Item(itemData.id_product, itemData.price, itemData.quantity);
+      order.items.push(item);
     }
 
-    return null;
+    return order;
   }
   
   async save(order: Order): Promise<void> {

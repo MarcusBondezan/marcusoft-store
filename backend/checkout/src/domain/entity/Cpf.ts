@@ -1,3 +1,4 @@
+// DDD - Value Object
 export default class Cpf {
   value: string;
 
