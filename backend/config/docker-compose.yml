@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   postgres:
+    container_name: marcusoft-store-postgres
     image: postgres:15.2
     volumes:
       - db_data:/var/lib/postgresql/data

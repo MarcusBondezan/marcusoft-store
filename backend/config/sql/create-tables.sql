@@ -11,7 +11,6 @@ CREATE TABLE "product" (
     CONSTRAINT "product_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "coupon" (
     "code" TEXT NOT NULL,
     "percentage" DECIMAL(65,30) NOT NULL,
@@ -20,7 +19,6 @@ CREATE TABLE "coupon" (
     CONSTRAINT "coupon_pkey" PRIMARY KEY ("code")
 );
 
--- CreateTable
 CREATE TABLE "order" (
     "id" UUID NOT NULL,
     "code" TEXT NOT NULL,
@@ -31,7 +29,6 @@ CREATE TABLE "order" (
     CONSTRAINT "order_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "item" (
     "id_order" UUID NOT NULL,
     "id_product" INTEGER NOT NULL,
@@ -43,6 +40,4 @@ CREATE TABLE "item" (
 
 -- AddForeignKey
 ALTER TABLE "item" ADD CONSTRAINT "item_id_order_fkey" FOREIGN KEY ("id_order") REFERENCES "order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "item" ADD CONSTRAINT "item_id_product_fkey" FOREIGN KEY ("id_product") REFERENCES "product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
