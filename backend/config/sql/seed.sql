@@ -19,3 +19,12 @@ VALUES('VALE20', 20, '2023-10-01T10:00:00');
 INSERT INTO public.coupon
 (code, percentage, expire_date)
 VALUES('VALE10', 10, '2022-10-01T10:00:00');
+
+-- ZipCodes
+INSERT INTO public.zipcode
+(code, lat, long)
+VALUES('22060030', -27.5945, -48.5477);
+
+INSERT INTO public.zipcode
+(code, lat, long)
+VALUES('88015600', -22.9129, -43.2003);

@@ -1,9 +1,13 @@
+import DistanceCalculator from "../../domain/entity/DistanceCalculator";
 import FreightCalculator from "../../domain/entity/FreightCalculator";
 import RepositoryFactory from "../factory/RepositoryFactory";
+import ZipCodeRepository from "../repository/ZipCodeRepository";
 
 export default class SimulateFreight {
-  
+  zipCodeRepository: ZipCodeRepository;
+
   constructor(repositoryFactory: RepositoryFactory) {
+    this.zipCodeRepository = repositoryFactory.createZipCodeRepository();
   }
 
   async execute(input: Input): Promise<Output> {
@@ -13,7 +17,14 @@ export default class SimulateFreight {
 
     for (const item of input.items) {
       if (input.from && input.to) {
-        const freight = FreightCalculator.calculate(1000, item.volume, item.density);
+        const from = await this.zipCodeRepository.get(input.from);
+        const to = await this.zipCodeRepository.get(input.to);
+        let distance = 1000;
+
+        if (from && to) {
+          distance = DistanceCalculator.calculate(from.coord, to.coord);
+        }
+        const freight = FreightCalculator.calculate(distance, item.volume, item.density);
 
         output.freight += freight * item.quantity;
       }
@@ -30,8 +41,8 @@ type Input = {
     density: number,
     quantity: number,
   }[],
-  from: string,
-  to: string,
+  from?: string,
+  to?: string,
 }
 
 type Output = {

@@ -38,6 +38,12 @@ CREATE TABLE "item" (
     CONSTRAINT "item_pkey" PRIMARY KEY ("id_order","id_product")
 );
 
+CREATE TABLE "zipcode" (
+    "code"  TEXT,
+    "lat"   NUMERIC,
+    "long"  NUMERIC,
+);
+
 -- AddForeignKey
 ALTER TABLE "item" ADD CONSTRAINT "item_id_order_fkey" FOREIGN KEY ("id_order") REFERENCES "order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "item" ADD CONSTRAINT "item_id_product_fkey" FOREIGN KEY ("id_product") REFERENCES "product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
