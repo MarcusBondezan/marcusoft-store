@@ -9,8 +9,11 @@ export default class GetOrder {
   }
 
   async execute(idOrder: string): Promise<Output> {
-    const orderData = await this.orderRepository.get(idOrder);
-    return orderData;
+    const order = await this.orderRepository.get(idOrder);
+    return {
+      total: order.getTotal(),
+      code: order.code
+    };
   }
 
 }

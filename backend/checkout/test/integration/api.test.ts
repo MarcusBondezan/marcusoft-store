@@ -31,7 +31,7 @@ test('Deve fazer um pedido com 3 itens', async function() {
 
 test('Deve listar os produtos em json', async function() {
   const response = await axios({
-    url: 'http://localhost:3001/products',
+    url: 'http://localhost:3002/products',
     headers: {
       'Content-Type': 'application/json',
     }
@@ -45,7 +45,7 @@ test('Deve listar os produtos em json', async function() {
 
 test('Deve listar os produtos em csv', async function() {
   const response = await axios({
-    url: 'http://localhost:3001/products',
+    url: 'http://localhost:3002/products',
     headers: {
       'Content-Type': 'text/csv',
     }

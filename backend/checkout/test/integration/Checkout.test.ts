@@ -2,7 +2,6 @@ import axios from 'axios';
 import sinon from 'sinon';
 import crypto from 'crypto';
 import Checkout from '../../src/application/usecase/Checkout';
-import ProductRepositoryDatabase from '../../src/infra/repository/ProductRepositoryDatabase';
 import GetOrder from '../../src/application/usecase/GetOrder';
 import Product from '../../src/domain/entity/Product';
 import DatabaseRepositoryFactory from '../../src/infra/factory/DatabaseRepositoryFactory';
@@ -174,11 +173,9 @@ test('Deve fazer um pedido com 3 itens e obter o pedido salvo', async function()
   expect(output.total).toBe(6090);
 });
 
-test('Deve fazer um pedido com 3 e gerar o código do pedido ', async function() {
+test('Deve fazer um pedido com 3 itens e gerar o código do pedido ', async function() {
   const orderRepository = repositoryFactory.createOrderRepository();
   await orderRepository.clear();
-  const now = new Date('2023-01-01T10:00:00');
-  //const dateStub = sinon.useFakeTimers(now.getTime());
   await checkout.execute({
     idOrder: crypto.randomUUID(),
     cpf: '685.830.780-09',
@@ -202,5 +199,4 @@ test('Deve fazer um pedido com 3 e gerar o código do pedido ', async function()
 
   const output = await getOrder.execute(idOrder2);
   expect(output.code).toBe('202300000002');
-  //dateStub.restore();
 });
