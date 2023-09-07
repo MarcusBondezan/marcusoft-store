@@ -9,11 +9,5 @@ export default class HttpController {
       const output = await checkout.execute(body);
       return output;
     });
-    httpServer.on("get", "/products", async function (params: any, body: any, headers: any) {
-      const contentType = headers['content-type'] || 'application/json';
-      const getProducts = useCaseFactory.createGetProducts(contentType);
-      const output = await getProducts.execute();
-      return output;
-    });
   }
 }

@@ -3,6 +3,7 @@ import FreightCalculator from "../../domain/entity/FreightCalculator";
 import RepositoryFactory from "../factory/RepositoryFactory";
 import ZipCodeRepository from "../repository/ZipCodeRepository";
 
+// Use Case (Clean Arch) or Application Service (DDD)
 export default class SimulateFreight {
   zipCodeRepository: ZipCodeRepository;
 
