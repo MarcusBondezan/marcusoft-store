@@ -29,6 +29,42 @@ test('Deve fazer um pedido com 3 itens', async function() {
   expect(output.total).toBe(6090);
 });
 
+test('Deve fazer um pedido com 2 itens calculando o frete', async function() {
+  const input = {
+    cpf: '407.302.170-27',
+    idOrder: crypto.randomUUID(),
+    items: [
+      { id: 1, quantity: 1 },
+      { id: 2, quantity: 1 },
+    ],
+    from: '22060030',
+    to: '88015600'
+  };
+  const response = await axios.post('http://localhost:3001/checkout', input);
+  const output = response.data;
+  expect(output.freight).toBe(187.05544450204079);
+  expect(output.total).toBe(6187.055444502041);
+});
+
+
+test('Deve fazer um pedido com 3 itens calculando o frete com preço mínimo', async function() {
+  const input = {
+    cpf: '407.302.170-27',
+    idOrder: crypto.randomUUID(),
+    items: [
+      { id: 1, quantity: 1 },
+      { id: 2, quantity: 1 },
+      { id: 3, quantity: 3 },
+    ],
+    from: '22060030',
+    to: '88015600'
+  };
+  const response = await axios.post('http://localhost:3001/checkout', input);
+  const output = response.data;
+  expect(output.freight).toBe(217.05544450204079);
+  expect(output.total).toBe(6307.055444502041);
+});
+
 test('Deve listar os produtos em json', async function() {
   const response = await axios({
     url: 'http://localhost:3002/products',

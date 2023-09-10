@@ -127,14 +127,14 @@ test('Deve fazer um pedido com 2 itens calculando o frete', async function() {
       { id: 1, quantity: 1 },
       { id: 2, quantity: 1 },
     ],
-    from: '88015600',
-    to: '22030060'
+    from: '22060030',
+    to: '88015600'
   };
 
   const output = await checkout.execute(input);
 
-  expect(output.freight).toBe(250);
-  expect(output.total).toBe(6250);
+  expect(output.freight).toBe(187.05544450204079);
+  expect(output.total).toBe(6187.055444502041);
 });
 
 test('Deve fazer um pedido com 3 itens calculando o frete com preço mínimo', async function() {
@@ -146,14 +146,14 @@ test('Deve fazer um pedido com 3 itens calculando o frete com preço mínimo', a
       { id: 2, quantity: 1 },
       { id: 3, quantity: 3 }
     ],
-    from: '88015600',
-    to: '22030060'
+    from: '22060030',
+    to: '88015600'
   };
 
   const output = await checkout.execute(input);
 
-  expect(output.freight).toBe(280);
-  expect(output.total).toBe(6370);
+  expect(output.freight).toBe(217.05544450204079);
+  expect(output.total).toBe(6307.055444502041);
 });
 
 test('Deve fazer um pedido com 3 itens e obter o pedido salvo', async function() {
