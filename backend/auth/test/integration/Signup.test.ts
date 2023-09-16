@@ -7,6 +7,7 @@ test('Deve fazer um signup', async function () {
   const connection = new PgPromiseAdapter();
   await connection.connect();
   const userRepository = new UserRepositoryDatabase(connection);
+  await userRepository.delete('jhonnyboy@gmail.com');
   const signup = new Signup(userRepository);
 
   await signup.execute({

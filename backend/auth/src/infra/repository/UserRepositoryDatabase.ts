@@ -18,4 +18,8 @@ export default class UserRepositoryDatabase implements UserRepository {
     return User.restore(userData.email, userData.password, userData.salt);
   }
 
+  async delete(email: string): Promise<void> {
+    await this.connection.query('delete from "user" where email = $1', [email]);
+  }
+
 }
