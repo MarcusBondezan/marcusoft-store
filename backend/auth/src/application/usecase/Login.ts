@@ -1,6 +1,6 @@
-import { pbkdf2Sync } from "crypto";
+
 import UserRepository from "../repository/UserRepository";
-import TokenGenerator from "./TokenGenerator";
+import TokenGenerator from "../../domain/entity/TokenGenerator";
 
 export default class Login {
   constructor (readonly userRepository: UserRepository) {}
@@ -8,15 +8,12 @@ export default class Login {
   async execute (input: Input): Promise<Output> {
     const user = await this.userRepository.get(input.email);
 
-    const inputPassword = pbkdf2Sync(input.password, user.salt, 64, 100, 'sha512').toString('hex');
-
-    if (user.password === inputPassword) {
-      const tokenGenerator = new TokenGenerator('secret');
-      return { token: tokenGenerator.sign(user, input.date) };
-    } else {
+    if (!user.isValidPassword(input.password)) {
       throw new Error('Authentication failed');
     }
 
+    const tokenGenerator = new TokenGenerator('secret');
+    return { token: tokenGenerator.sign(user, input.date) };
   }
 }
 

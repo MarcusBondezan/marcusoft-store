@@ -6,7 +6,11 @@ export default class UserRepositoryDatabase implements UserRepository {
   constructor (readonly connection: DatabaseConnection) {}
 
   async save(user: User): Promise<void> {
-    await this.connection.query('insert into "user" (email, password, salt) values ($1, $2, $3)', [user.email.value, user.password, user.salt]);
+    await this.connection.query('insert into "user" (email, password, salt) values ($1, $2, $3)', [user.email.value, user.password.value, user.password.salt]);
+  }
+
+  async update(user: User): Promise<void> {
+    await this.connection.query('update "user" set email = $1, password = $2, salt = $3 where email = $1', [user.email.value, user.password.value, user.password.salt])
   }
 
   async get(email: string): Promise<User> {

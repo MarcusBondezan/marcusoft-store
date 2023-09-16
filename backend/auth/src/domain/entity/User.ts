@@ -1,22 +1,25 @@
-import { pbkdf2Sync, randomBytes } from 'crypto';
 import Email from "./Email";
+import Password from './Password';
 
+// Entity - Aggregate Root
 export default class User {
-  email: Email;
-
-  private constructor(email: string, readonly password: string, readonly salt: string) {
-    this.email = new Email(email);
-  }
+  private constructor(public email: Email, public password: Password) {}
 
   // static factory method
   static create (email: string, password: string): User {
-    const salt = randomBytes(20).toString('hex')
-    const hash = pbkdf2Sync(password, salt, 64, 100, 'sha512').toString('hex');
-    return new User(email, hash, salt);
+    return new User(new Email(email), Password.create(password));
   }
 
   // static factory method
   static restore (email: string, password: string, salt: string): User {
-    return new User(email, password, salt);
+    return new User(new Email(email), Password.restore(password, salt));
+  }
+
+  updatePassword(password: string): void {
+    this.password = Password.create(password);
+  }
+
+  isValidPassword(password: string): boolean {
+    return this.password.validate(password);
   }
 }

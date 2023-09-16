@@ -1,6 +1,7 @@
 import { sign } from 'jsonwebtoken';
-import User from '../../domain/entity/User';
+import User from './User';
 
+// Domain Service
 export default class TokenGenerator {
   EXPIRES_IN = 1000000;
 
