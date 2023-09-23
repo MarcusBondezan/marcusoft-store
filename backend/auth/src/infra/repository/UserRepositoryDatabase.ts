@@ -6,7 +6,7 @@ export default class UserRepositoryDatabase implements UserRepository {
   constructor (readonly connection: DatabaseConnection) {}
 
   async save(user: User): Promise<void> {
-    await this.connection.query('insert into "user" (email, password, salt) values ($1, $2, $3)', [user.email.value, user.password.value, user.password.salt]);
+    await this.connection.query('insert into "user" (email, password, salt, password_type) values ($1, $2, $3, $4)', [user.email.value, user.password.value, user.password.salt, user.passwordType]);
   }
 
   async update(user: User): Promise<void> {
@@ -15,7 +15,7 @@ export default class UserRepositoryDatabase implements UserRepository {
 
   async get(email: string): Promise<User> {
     const [userData] = await this.connection.query('select * from "user" us where us.email = $1', [email]);
-    return User.restore(userData.email, userData.password, userData.salt);
+    return User.restore(userData.email, userData.password, userData.salt, userData.password_type);
   }
 
   async delete(email: string): Promise<void> {

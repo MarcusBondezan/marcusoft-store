@@ -60,7 +60,8 @@ INSERT INTO public.zipcode (code, lat, long) VALUES('22060030', -27.5945, -48.54
 INSERT INTO public.zipcode (code, lat, long) VALUES('88015600', -22.9129, -43.2003);
 
 CREATE TABLE "user" (
-    "email"     TEXT    NOT NULL,
-    "password"  TEXT    NOT NULL,
-    "salt"      TEXT    NOT NULL
+    "email"         TEXT    NOT NULL,
+    "password"      TEXT    NOT NULL,
+    "salt"          TEXT    NOT NULL,
+    "password_type" TEXT    NOT NULL
 );
