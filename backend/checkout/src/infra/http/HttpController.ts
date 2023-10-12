@@ -9,5 +9,11 @@ export default class HttpController {
       const output = await checkout.execute(body);
       return output;
     });
+
+    httpServer.on("get", "/orders/:idOrder", async function (params: any, body: any) {
+      const getOrder = useCaseFactory.createGetOrder();
+      const output = await getOrder.execute(params.idOrder);
+      return output;
+    });
   }
 }
