@@ -4,13 +4,11 @@ import UseCaseFactory from "../factory/UseCaseFactory";
 // Interface Adapter
 export default class HttpController {
   constructor(httpServer: HttpServer, useCaseFactory: UseCaseFactory) {
-    /*
-    httpServer.on("get", "/products", async function (params: any, body: any, headers: any) {
-      const contentType = headers['content-type'] || 'application/json';
-      const getProducts = useCaseFactory.createGetProducts(contentType);
-      const output = await getProducts.execute();
+
+    httpServer.on("post", "/verify", async function (params: any, body: any, headers: any) {
+      const verify = useCaseFactory.createVerify();
+      const output = await verify.execute(body.token);
       return output;
     });
-    */
   }
 }
