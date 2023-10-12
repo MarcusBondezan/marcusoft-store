@@ -5,21 +5,28 @@ import RepositoryFactory from '../factory/RepositoryFactory';
 import GatewayFactory from '../factory/GatewayFactory';
 import CatalogGateway from '../gateway/CatalogGateway';
 import FreightGateway from '../gateway/FreightGateway';
+import AuthGateway from '../gateway/AuthGateway';
 
 export default class Checkout {
   orderRepository: OrderRepository;
   couponRepository: CouponRepository;
   catalogGateway: CatalogGateway;
   freightGateway: FreightGateway;
+  authGateway: AuthGateway;
 
   constructor(repositoryFactory: RepositoryFactory, gatewayFactory: GatewayFactory) {
     this.orderRepository = repositoryFactory.createOrderRepository();
     this.couponRepository = repositoryFactory.createCouponRepository();
     this.catalogGateway = gatewayFactory.createCatalogGateway();
     this.freightGateway = gatewayFactory.createFreightGateway();
+    this.authGateway = gatewayFactory.createAuthGateway();
   }
 
   async execute(input: Input): Promise<Output> {
+    if (input.token) {
+      const session = await this.authGateway.verify(input.token);
+      if (!session) throw new Error('Authentication failed');
+    }
     const sequence = await this.orderRepository.count();
     const order = new Order(input.idOrder, input.cpf, input.date, sequence + 1);
     const inputFreight: any = {
@@ -75,6 +82,7 @@ type Input = {
   coupon?: string,
   from?: string,
   to?: string,
+  token?: string,
 }
 
 type Output = {

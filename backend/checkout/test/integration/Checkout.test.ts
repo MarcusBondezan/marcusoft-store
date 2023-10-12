@@ -29,7 +29,7 @@ beforeEach(async () => {
   const httpClient = new AxiosAdapter();
   const gatewayFactory = new GatewayHttpFactory(httpClient);
   checkout = new Checkout(repositoryFactory, gatewayFactory);
-  getOrder = new GetOrder(repositoryFactory);
+  getOrder = new GetOrder(repositoryFactory, gatewayFactory);
 });
 
 afterEach(async () => {

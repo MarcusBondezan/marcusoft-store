@@ -11,7 +11,7 @@ export default class UseCaseFactory {
   }
 
   createGetOrder(): GetOrder {
-    return new GetOrder(this.repositoryFactory);
+    return new GetOrder(this.repositoryFactory, this.gatewayFactory);
   }
 
 }
