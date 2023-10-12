@@ -23,7 +23,7 @@ CREATE TABLE "coupon" (
     CONSTRAINT "coupon_pkey" PRIMARY KEY ("code")
 );
 
-INSERT INTO public.coupon (code, percentage, expire_date) VALUES('VALE20', 20, '2023-10-01T10:00:00');
+INSERT INTO public.coupon (code, percentage, expire_date) VALUES('VALE20', 20, '2033-10-01T10:00:00');
 INSERT INTO public.coupon (code, percentage, expire_date) VALUES('VALE10', 10, '2022-10-01T10:00:00');
 
 CREATE TABLE "order" (

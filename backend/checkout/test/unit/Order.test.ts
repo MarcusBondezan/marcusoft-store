@@ -55,7 +55,7 @@ test('Deve criar um pedido com 3 itens', function() {
   order.addItem(new Product(2,'B',5000,50,50,50,22), 1);
   order.addItem(new Product(3,'C',30,10,10,10,0.9), 3);
 
-  order.addCoupon(new Coupon('VALE20', 20, new Date('2023-10-01T10:00:00')));
+  order.addCoupon(new Coupon('VALE20', 20, new Date('2033-10-01T10:00:00')));
 
   expect(order.getTotal()).toBe(4872);
 });
