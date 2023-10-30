@@ -90,7 +90,7 @@ test('Deve listar os produtos em csv', async function() {
   expect(output).toBe("1;A;1000\n2;B;5000\n3;C;30");
 });
 
-test.only('Deve fazer um pedido com 3 itens e validar a autenticação', async function() {
+test('Deve fazer um pedido com 3 itens e validar a autenticação', async function() {
   const idOrder = crypto.randomUUID();
   const input = {
     cpf: '407.302.170-27',
