@@ -6,8 +6,9 @@ import GatewayFactory from '../factory/GatewayFactory';
 import CatalogGateway from '../gateway/CatalogGateway';
 import FreightGateway from '../gateway/FreightGateway';
 import AuthGateway from '../gateway/AuthGateway';
+import UseCase from './UseCase';
 
-export default class Checkout {
+export default class Checkout implements UseCase {
   orderRepository: OrderRepository;
   couponRepository: CouponRepository;
   catalogGateway: CatalogGateway;
@@ -23,10 +24,6 @@ export default class Checkout {
   }
 
   async execute(input: Input): Promise<Output> {
-    if (input.token) {
-      const session = await this.authGateway.verify(input.token);
-      if (!session) throw new Error('Authentication failed');
-    }
     const sequence = await this.orderRepository.count();
     const order = new Order(input.idOrder, input.cpf, input.date, sequence + 1);
     const inputFreight: any = {
