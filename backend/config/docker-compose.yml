@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+
   postgres:
     container_name: marcusoft-store-postgres
     image: postgres:15.2
@@ -12,6 +13,19 @@ services:
       - POSTGRES_DB=marcusoft
       - POSTGRES_USER=marcusoft_admin
       - POSTGRES_PASSWORD=123456
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.12.7-management-alpine
+    ports:
+        - 5672:5672
+        - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=marcusoft_admin
+      - RABBITMQ_DEFAULT_PASS=123456
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
 volumes:
   db_data:
