@@ -7,6 +7,7 @@ import CatalogGateway from '../gateway/CatalogGateway';
 import FreightGateway from '../gateway/FreightGateway';
 import AuthGateway from '../gateway/AuthGateway';
 import UseCase from './UseCase';
+import StockGateway from '../gateway/StockGateway';
 
 export default class Checkout implements UseCase {
   orderRepository: OrderRepository;
@@ -14,6 +15,7 @@ export default class Checkout implements UseCase {
   catalogGateway: CatalogGateway;
   freightGateway: FreightGateway;
   authGateway: AuthGateway;
+  stockGateway: StockGateway;
 
   constructor(repositoryFactory: RepositoryFactory, gatewayFactory: GatewayFactory) {
     this.orderRepository = repositoryFactory.createOrderRepository();
@@ -21,6 +23,7 @@ export default class Checkout implements UseCase {
     this.catalogGateway = gatewayFactory.createCatalogGateway();
     this.freightGateway = gatewayFactory.createFreightGateway();
     this.authGateway = gatewayFactory.createAuthGateway();
+    this.stockGateway = gatewayFactory.createStockGateway();
   }
 
   async execute(input: Input): Promise<Output> {
@@ -33,12 +36,10 @@ export default class Checkout implements UseCase {
     };
 
     for (const item of input.items) {
-      //const product = await this.productRepository.get(item.id);
       const product = await this.catalogGateway.getProduct(item.id);
 
       if (product) {
         order.addItem(product, item.quantity);        
-        //order.freight += FreightCalculator.calculate(product) * item.quantity;
         inputFreight.items.push({
           volume: product.volume,
           density: product.density,
@@ -60,6 +61,7 @@ export default class Checkout implements UseCase {
     }
 
     await this.orderRepository.save(order);
+    await this.stockGateway.decreaseStock(order);
 
     return {
       freight: order.freight,
