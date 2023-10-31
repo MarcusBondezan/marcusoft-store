@@ -8,7 +8,7 @@ export default class StockEntryRepositoryDatabase implements StockEntryRepositor
   constructor(readonly connection: DatabaseConnection) {}
 
   async save(stockEntry: StockEntry): Promise<void> {
-    await this.connection.query('insert into stock_entry (id_product, operation, quantity values ($1, $2, $3))', [stockEntry.idProduct, stockEntry.operation, stockEntry.quantity]);
+    await this.connection.query('insert into stock_entry (id_product, operation, quantity) values ($1, $2, $3)', [stockEntry.idProduct, stockEntry.operation, stockEntry.quantity]);
   }
 
   async getStockEntries(idProduct: number): Promise<StockEntry[]> {
