@@ -65,3 +65,10 @@ CREATE TABLE "user" (
     "salt"          TEXT    NOT NULL,
     "password_type" TEXT    NOT NULL
 );
+
+CREATE TABLE "stock_entry" (
+    "id_product"    INTEGER     NOT NULL,
+    "operation"     TEXT        NOT NULL,
+    "quantity"      INTEGER     NOT NULL
+);
+

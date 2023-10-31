@@ -31,6 +31,14 @@ module.exports = {
         "NODE_ENV": "development",
         "API_PORT":"3001",
       }
+    },
+    {
+      name: "stock",
+      script: "npx ts-node ../stock/src/main_api.ts",
+      env: {
+        "NODE_ENV": "development",
+        "API_PORT":"3005",
+      }
     }
   ],
 };
