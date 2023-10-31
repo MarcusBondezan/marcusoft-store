@@ -8,6 +8,7 @@ import FreightGateway from '../gateway/FreightGateway';
 import AuthGateway from '../gateway/AuthGateway';
 import UseCase from './UseCase';
 import StockGateway from '../gateway/StockGateway';
+import Queue from '../../infra/queue/Queue';
 
 export default class Checkout implements UseCase {
   orderRepository: OrderRepository;
@@ -17,7 +18,7 @@ export default class Checkout implements UseCase {
   authGateway: AuthGateway;
   stockGateway: StockGateway;
 
-  constructor(repositoryFactory: RepositoryFactory, gatewayFactory: GatewayFactory) {
+  constructor(repositoryFactory: RepositoryFactory, gatewayFactory: GatewayFactory, readonly queue?: Queue) {
     this.orderRepository = repositoryFactory.createOrderRepository();
     this.couponRepository = repositoryFactory.createCouponRepository();
     this.catalogGateway = gatewayFactory.createCatalogGateway();
@@ -61,7 +62,10 @@ export default class Checkout implements UseCase {
     }
 
     await this.orderRepository.save(order);
-    await this.stockGateway.decreaseStock(order);
+    
+    if(this.queue) {
+      await this.queue.publish('orderPlaced', order);
+    }
 
     return {
       freight: order.freight,

@@ -7,16 +7,23 @@ import HttpController from './infra/http/HttpController';
 import UseCaseFactory from './infra/factory/UseCaseFactory';
 import GatewayHttpFactory from './infra/factory/GatewayHttpFactory';
 import AxiosAdapter from './infra/http/AxiosAdapter';
+import RabbitMQAdapter from './infra/queue/RabbitMQAdapter';
 
 dotenv.config()
 const port = Number(process.env.API_PORT) || 3000;
 
-const connection = new PgPromiseAdapter();
-connection.connect();
-const repositoryFactory = new DatabaseRepositoryFactory(connection);
-const httpClient = new AxiosAdapter();
-const gatewayFactory = new GatewayHttpFactory(httpClient);
-const useCaseFactory = new UseCaseFactory(repositoryFactory, gatewayFactory);
-const httpServer = new ExpressAdapter();
-new HttpController(httpServer, useCaseFactory);
-httpServer.listen(port);
+async function main() {
+  const connection = new PgPromiseAdapter();
+  connection.connect();
+  const repositoryFactory = new DatabaseRepositoryFactory(connection);
+  const httpClient = new AxiosAdapter();
+  const queue = new RabbitMQAdapter();
+  await queue.connect();
+  const gatewayFactory = new GatewayHttpFactory(httpClient);
+  const useCaseFactory = new UseCaseFactory(repositoryFactory, gatewayFactory, queue);
+  const httpServer = new ExpressAdapter();
+  new HttpController(httpServer, useCaseFactory);
+  httpServer.listen(port);
+}
+
+main();
