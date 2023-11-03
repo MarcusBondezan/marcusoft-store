@@ -8,6 +8,7 @@ import UseCaseFactory from './infra/factory/UseCaseFactory';
 import GatewayHttpFactory from './infra/factory/GatewayHttpFactory';
 import AxiosAdapter from './infra/http/AxiosAdapter';
 import RabbitMQAdapter from './infra/queue/RabbitMQAdapter';
+import QueueController from './infra/queue/QueueController';
 
 dotenv.config()
 const port = Number(process.env.API_PORT) || 3000;
@@ -22,7 +23,8 @@ async function main() {
   const gatewayFactory = new GatewayHttpFactory(httpClient);
   const useCaseFactory = new UseCaseFactory(repositoryFactory, gatewayFactory, queue);
   const httpServer = new ExpressAdapter();
-  new HttpController(httpServer, useCaseFactory);
+  new HttpController(httpServer, useCaseFactory, queue);
+  new QueueController(queue, useCaseFactory);
   httpServer.listen(port);
 }
 

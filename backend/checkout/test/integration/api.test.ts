@@ -5,6 +5,14 @@ axios.defaults.validateStatus = function () {
   return true;
 }
 
+async function sleep (time: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, time)
+  });
+}
+
 test('Não deve criar pedido com cpf inválido', async function() {
   const input = {
     cpf: '406.302.170-27'
@@ -102,6 +110,24 @@ test('Deve fazer um pedido com 3 itens e validar a autenticação', async functi
     ],
   };
   await axios.post('http://localhost:3001/checkout', input, { headers: { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impob25ueWJveUBnbWFpbC5jb20iLCJpYXQiOjE2NDYxMzk2MDAwMDAsImV4cGlyZXNJbiI6MTAwMDAwMH0._3HyYWyFMbcvyhuoQZVOveetk9qm2y01nXVKgRAwo2A' }});
+  const response = await axios.get(`http://localhost:3001/orders/${idOrder}`);
+  const output = response.data;
+  expect(output.total).toBe(6090);
+});
+
+test('Deve fazer um pedido com 3 itens assincrona', async function() {
+  const idOrder = crypto.randomUUID();
+  const input = {
+    cpf: '407.302.170-27',
+    idOrder,
+    items: [
+      { id: 1, quantity: 1 },
+      { id: 2, quantity: 1 },
+      { id: 3, quantity: 3 },
+    ]
+  };
+  await axios.post('http://localhost:3001/checkoutAsync', input);
+  await sleep(200);
   const response = await axios.get(`http://localhost:3001/orders/${idOrder}`);
   const output = response.data;
   expect(output.total).toBe(6090);
