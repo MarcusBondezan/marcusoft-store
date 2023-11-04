@@ -21,6 +21,24 @@ export default class OrderRepositoryDatabase implements OrderRepository {
 
     return order;
   }
+
+  async list(): Promise<Order[]> {
+    const orders: Order[] = [];
+
+    const ordersData = await this.connection.query('select * from "order"', []);
+
+    for (const orderData of ordersData) {
+      const order = new Order(orderData.id, orderData.cpf, orderData.date, orderData.sequence);
+      const itemsData = await this.connection.query('select * from "item" where id_order = $1', [order.idOrder]);
+      for (const itemData of itemsData) {
+        const item = new Item(itemData.id_product, itemData.price, itemData.quantity);
+        order.items.push(item);
+      }
+      orders.push(order);
+    }
+
+    return orders;
+  }
   
   async save(order: Order): Promise<void> {
     await this.connection.query('insert into "order" (id, code, cpf, total, freight, date, sequence) values ($1, $2, $3, $4, $5, $6, $7)', [
